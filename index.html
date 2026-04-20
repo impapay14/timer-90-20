@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Таймер · 90 / 20</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #f0eee9; overflow: hidden; }
+  * { box-sizing: border-box; }
+  button:focus-visible { outline: 1px solid rgba(255,255,255,0.4); outline-offset: 2px; }
+  button { font-family: inherit; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="timer-core.jsx"></script>
+<script type="text/babel" src="progress-bar.jsx"></script>
+<script type="text/babel" src="variant-c.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+/*
+  Canvas composition:
+  Three frameless Windows app mockups placed on a design canvas.
+  Each artboard is 880×560 — realistic compact-utility proportions (~16:10).
+  All three share timer logic but present it differently.
+*/
+
+const WIN_W = 880;
+const WIN_H = 560;
+
+function FramelessWindow({ children }) {
+  return (
+    <div style={{
+      width: WIN_W, height: WIN_H,
+      background: '#0a0a0a',
+      borderRadius: 8,
+      overflow: 'hidden',
+      // subtle windows-11 style outer edge + light halo
+      boxShadow: `
+        0 0 0 1px rgba(255,255,255,0.04),
+        0 30px 80px -20px rgba(0,0,0,0.6),
+        0 8px 20px -8px rgba(0,0,0,0.4)
+      `,
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      {/* Intro / thinking-out-loud */}
+      <div style={{
+        padding: '0 60px 32px',
+        maxWidth: 820,
+      }}>
+        <div style={{
+          fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase',
+          color: 'rgba(60,50,40,0.55)', fontFamily: '"JetBrains Mono", monospace',
+          marginBottom: 12,
+        }}>exploration · windows desktop timer</div>
+        <div style={{
+          fontSize: 32, fontWeight: 500, letterSpacing: -0.5,
+          color: 'rgba(40,30,20,0.88)', marginBottom: 14,
+          fontFamily: '"Inter", sans-serif',
+        }}>
+          Таймер 90 / 20
+        </div>
+        <div style={{
+          fontSize: 14, lineHeight: 1.6, color: 'rgba(60,50,40,0.72)',
+          fontFamily: '"Inter", sans-serif', maxWidth: 680,
+        }}>
+          Frameless (без системной рамки), near-black фон, моноширинные
+          цифры, один неоновый акцент: <b style={{color: 'oklch(0.62 0.17 130)'}}>лайм</b> для
+          фокуса, <b style={{color: 'oklch(0.55 0.10 205)'}}>циан</b> для отдыха.
+          Прогресс — 90 / 20 тонких штрихов под таймером.
+          Анимация только в переходах цвета и цифр. Space — пауза, R — сброс.
+        </div>
+      </div>
+
+      <DCSection title="Вариант" subtitle="Нажми Space или кликни по кнопке">
+        <DCArtboard label="C · Ultra-minimal">
+          <FramelessWindow><VariantC/></FramelessWindow>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection title="Заметки о системе" subtitle="Что лежит в основе">
+        <DCArtboard label="Палитра" width={400} height={220}>
+          <div style={{
+            width: '100%', height: '100%', background: '#0a0a0a',
+            padding: 24, fontFamily: '"JetBrains Mono", monospace', fontSize: 10,
+            color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase',
+            display: 'flex', flexDirection: 'column', gap: 14,
+          }}>
+            <Swatch color="#0a0a0a" label="bg · #0a0a0a" border/>
+            <Swatch color="oklch(0.88 0.17 130)" label="neon focus · lime"/>
+            <Swatch color="oklch(0.86 0.10 205)" label="neon rest · cyan"/>
+            <Swatch color="rgba(255,255,255,0.92)" label="fg · 92% white"/>
+            <Swatch color="rgba(255,255,255,0.12)" label="line · 12% white" border/>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard label="Типографика" width={400} height={220}>
+          <div style={{
+            width: '100%', height: '100%', background: '#0a0a0a',
+            padding: '20px 24px', fontFamily: '"JetBrains Mono", monospace',
+            color: 'rgba(255,255,255,0.9)',
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+          }}>
+            <div style={{
+              fontSize: 64, fontWeight: 200, letterSpacing: '-0.06em',
+              fontVariantNumeric: 'tabular-nums',
+            }}>90:00</div>
+            <div style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+              JetBrains Mono · 200 / 300 / 400<br/>
+              tabular-nums · -0.06em tracking
+            </div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard label="Прогресс — 90 штрихов" width={400} height={220}>
+          <div style={{
+            width: '100%', height: '100%', background: '#0a0a0a',
+            padding: 24, display: 'flex', flexDirection: 'column',
+            justifyContent: 'center', gap: 22,
+          }}>
+            <div>
+              <div style={{fontSize:9,letterSpacing:'0.2em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)',marginBottom:10,fontFamily:'"JetBrains Mono", monospace'}}>focus · 24 / 90</div>
+              <TickBar progress={24/90} mode="focus" total={90*60} width={340} />
+            </div>
+            <div>
+              <div style={{fontSize:9,letterSpacing:'0.2em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)',marginBottom:10,fontFamily:'"JetBrains Mono", monospace'}}>rest · 08 / 20</div>
+              <TickBar progress={8/20} mode="rest" total={20*60} width={340} />
+            </div>
+          </div>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+function Swatch({ color, label, border }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{
+        width: 40, height: 18, background: color,
+        border: border ? '1px solid rgba(255,255,255,0.1)' : 'none',
+      }}/>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
