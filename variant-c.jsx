@@ -5,6 +5,12 @@ function VariantC() {
   const t = useTimer();
   const neon = t.mode === 'focus' ? TOKENS.neonFocus : TOKENS.neonRest;
   const [hover, setHover] = React.useState(false);
+  const [isTouch, setIsTouch] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      setIsTouch(window.matchMedia('(hover: none)').matches);
+    }
+  }, []);
 
   return (
     <div
@@ -21,13 +27,13 @@ function VariantC() {
         flexDirection: 'column',
         transition: 'background 1400ms ease',
         position: 'relative',
-        padding: '40px 48px 36px',
+        padding: 'clamp(16px, 4vw, 40px) clamp(16px, 5vw, 48px) clamp(16px, 4vw, 36px)',
         boxSizing: 'border-box',
       }}
     >
       {/* top: mode labels */}
       <div style={{
-        display: 'flex', gap: 28,
+        display: 'flex', gap: 'clamp(14px, 4vw, 28px)',
         fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
       }}>
         <ModeWord active={t.mode === 'focus'} neon={TOKENS.neonFocus} disabled={t.state==='running'}
@@ -47,7 +53,7 @@ function VariantC() {
         justifyContent: 'flex-start',
       }}>
         <div style={{
-          fontSize: 260,
+          fontSize: 'clamp(80px, 26vw, 260px)',
           fontWeight: 200,
           letterSpacing: '-0.07em',
           lineHeight: 0.9,
@@ -65,7 +71,7 @@ function VariantC() {
         display: 'flex', alignItems: 'flex-end',
         justifyContent: 'space-between',
         gap: 24,
-        opacity: hover || t.state === 'idle' || t.state === 'paused' ? 1 : 0.18,
+        opacity: isTouch || hover || t.state === 'idle' || t.state === 'paused' ? 1 : 0.18,
         transition: 'opacity 600ms ease',
       }}>
         <div style={{ display: 'flex', gap: 18 }}>
@@ -74,16 +80,18 @@ function VariantC() {
           </MinButton>
           <MinButton onClick={t.reset}>reset</MinButton>
         </div>
-        <div style={{
-          fontSize: 9, color: TOKENS.dim,
-          letterSpacing: '0.2em', textTransform: 'uppercase',
-        }}>
-          space · r
-        </div>
+        {!isTouch && (
+          <div style={{
+            fontSize: 9, color: TOKENS.dim,
+            letterSpacing: '0.2em', textTransform: 'uppercase',
+          }}>
+            space · r
+          </div>
+        )}
       </div>
 
       {/* Bottom: tick bar — full width */}
-      <div style={{ marginTop: 28 }}>
+      <div style={{ marginTop: 'clamp(16px, 3vw, 28px)' }}>
         <TickBar progress={t.progress} mode={t.mode} total={t.total} width="100%" />
       </div>
     </div>
